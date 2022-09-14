@@ -61,8 +61,9 @@ mod tranche;
 pub mod weights;
 
 #[derive(Clone, Encode, Decode, Eq, PartialEq, RuntimeDebug, TypeInfo)]
-pub struct PoolDetails<CurrencyId, EpochId, Balance, Rate, Weight, TrancheId, PoolId>
+pub struct PoolDetails<CurrencyId, EpochId, Balance, Rate, MetaSize, Weight, TrancheId, PoolId>
 where
+	MetaSize: Get<u32> + Copy,
 	Rate: FixedPointNumber<Inner = Balance>,
 	Balance: FixedPointOperand,
 {
@@ -72,6 +73,8 @@ where
 	pub tranches: Tranches<Balance, Rate, Weight, CurrencyId, TrancheId, PoolId>,
 	/// Details about the parameters of the pool.
 	pub parameters: PoolParameters,
+	/// Metadata that specifies the pool.
+	pub metadata: Option<BoundedVec<u8, MetaSize>>,
 	/// The status the pool is currently in.
 	pub status: PoolStatus,
 	/// Details about the epochs of the pool.
@@ -138,9 +141,10 @@ where
 	pub scheduled_time: Moment,
 }
 
-impl<CurrencyId, EpochId, Balance, Rate, Weight, TrancheId, PoolId>
-	PoolDetails<CurrencyId, EpochId, Balance, Rate, Weight, TrancheId, PoolId>
+impl<CurrencyId, EpochId, Balance, Rate, MetaSize, Weight, TrancheId, PoolId>
+	PoolDetails<CurrencyId, EpochId, Balance, Rate, MetaSize, Weight, TrancheId, PoolId>
 where
+	MetaSize: Get<u32> + Copy,
 	Rate: FixedPointNumber<Inner = Balance>,
 	Balance: FixedPointOperand,
 	EpochId: BaseArithmetic,
@@ -226,6 +230,7 @@ type PoolDetailsOf<T> = PoolDetails<
 	<T as Config>::EpochId,
 	<T as Config>::Balance,
 	<T as Config>::InterestRate,
+	<T as Config>::MaxSizeMetadata,
 	<T as Config>::TrancheWeight,
 	<T as Config>::TrancheId,
 	<T as Config>::PoolId,
@@ -735,7 +740,7 @@ pub mod pallet {
 					token_symbol.to_vec(),
 				);
 
-				T::AssetRegistry::register_asset(Some(&tranche.currency), metadata)
+				T::AssetRegistry::register_asset(Some(tranche.currency), metadata)
 					.map_err(|_| Error::<T>::FailedToRegisterTrancheMetadata)?;
 			}
 
