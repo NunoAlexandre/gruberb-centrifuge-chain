@@ -735,7 +735,7 @@ pub mod pallet {
 					token_symbol.to_vec(),
 				);
 
-				T::AssetRegistry::register_asset(Some(tranche.currency), metadata)
+				T::AssetRegistry::register_asset(Some(&tranche.currency), metadata)
 					.map_err(|_| Error::<T>::FailedToRegisterTrancheMetadata)?;
 			}
 
