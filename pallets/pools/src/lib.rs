@@ -61,9 +61,8 @@ mod tranche;
 pub mod weights;
 
 #[derive(Clone, Encode, Decode, Eq, PartialEq, RuntimeDebug, TypeInfo)]
-pub struct PoolDetails<CurrencyId, EpochId, Balance, Rate, MetaSize, Weight, TrancheId, PoolId>
+pub struct PoolDetails<CurrencyId, EpochId, Balance, Rate, Weight, TrancheId, PoolId>
 where
-	MetaSize: Get<u32> + Copy,
 	Rate: FixedPointNumber<Inner = Balance>,
 	Balance: FixedPointOperand,
 {
@@ -73,8 +72,6 @@ where
 	pub tranches: Tranches<Balance, Rate, Weight, CurrencyId, TrancheId, PoolId>,
 	/// Details about the parameters of the pool.
 	pub parameters: PoolParameters,
-	/// Metadata that specifies the pool.
-	pub metadata: Option<BoundedVec<u8, MetaSize>>,
 	/// The status the pool is currently in.
 	pub status: PoolStatus,
 	/// Details about the epochs of the pool.
@@ -141,10 +138,9 @@ where
 	pub scheduled_time: Moment,
 }
 
-impl<CurrencyId, EpochId, Balance, Rate, MetaSize, Weight, TrancheId, PoolId>
-	PoolDetails<CurrencyId, EpochId, Balance, Rate, MetaSize, Weight, TrancheId, PoolId>
+impl<CurrencyId, EpochId, Balance, Rate, Weight, TrancheId, PoolId>
+	PoolDetails<CurrencyId, EpochId, Balance, Rate, Weight, TrancheId, PoolId>
 where
-	MetaSize: Get<u32> + Copy,
 	Rate: FixedPointNumber<Inner = Balance>,
 	Balance: FixedPointOperand,
 	EpochId: BaseArithmetic,
@@ -230,7 +226,6 @@ type PoolDetailsOf<T> = PoolDetails<
 	<T as Config>::EpochId,
 	<T as Config>::Balance,
 	<T as Config>::InterestRate,
-	<T as Config>::MaxSizeMetadata,
 	<T as Config>::TrancheWeight,
 	<T as Config>::TrancheId,
 	<T as Config>::PoolId,
@@ -916,40 +911,6 @@ pub mod pallet {
 
 			let num_tranches = pool.tranches.num_tranches().try_into().unwrap();
 			Ok(Some(T::WeightInfo::execute_scheduled_update(num_tranches)).into())
-		}
-
-		/// Sets the IPFS hash for the pool metadata information.
-		///
-		/// The caller must have the `PoolAdmin` role in order to
-		/// invoke this extrinsic.
-		#[pallet::weight(T::WeightInfo::set_metadata(metadata.len().try_into().unwrap_or(u32::MAX)))]
-		pub fn set_metadata(
-			origin: OriginFor<T>,
-			pool_id: T::PoolId,
-			metadata: Vec<u8>,
-		) -> DispatchResult {
-			let who = ensure_signed(origin)?;
-			ensure!(
-				T::Permission::has(
-					PermissionScope::Pool(pool_id),
-					who,
-					Role::PoolRole(PoolRole::PoolAdmin)
-				),
-				BadOrigin
-			);
-
-			let checked_metadata: BoundedVec<u8, T::MaxSizeMetadata> =
-				metadata.try_into().map_err(|_| Error::<T>::BadMetadata)?;
-
-			Pool::<T>::try_mutate(pool_id, |pool| -> DispatchResult {
-				let pool = pool.as_mut().ok_or(Error::<T>::NoSuchPool)?;
-				pool.metadata = Some(checked_metadata.clone());
-				Self::deposit_event(Event::MetadataSet {
-					pool_id,
-					metadata: checked_metadata,
-				});
-				Ok(())
-			})
 		}
 
 		/// Sets the maximum reserve for a pool
