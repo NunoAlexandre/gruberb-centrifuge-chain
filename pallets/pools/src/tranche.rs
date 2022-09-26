@@ -13,7 +13,7 @@
 use cfg_traits::TrancheToken as TrancheTokenT;
 #[cfg(test)]
 use cfg_types::CurrencyId;
-use cfg_types::{CustomMetadata, TrancheMetada, TrancheType, TrancheUpdate, XcmMetadata};
+use cfg_types::{CustomMetadata, Seniority, TrancheInput, TrancheType, TrancheUpdate, XcmMetadata};
 use frame_support::{sp_runtime::ArithmeticError, StorageHasher};
 use orml_traits::asset_registry::AssetMetadata;
 use polkadot_parachain::primitives::Id as ParachainId;

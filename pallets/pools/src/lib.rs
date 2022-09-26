@@ -15,7 +15,10 @@
 
 use cfg_primitives::Moment;
 use cfg_traits::{Permissions, PoolInspect, PoolNAV, PoolReserve, TrancheToken};
-use cfg_types::{PermissionScope, PoolChanges, PoolLocator, PoolRole, Role};
+use cfg_types::{
+	PermissionScope, PoolChanges, PoolLocator, PoolRole, Role, TrancheInput, TrancheType,
+	TrancheUpdate,
+};
 use codec::HasCompact;
 use frame_support::{
 	dispatch::DispatchResult,
@@ -412,9 +415,6 @@ pub mod pallet {
 		/// The amount that must be reserved to create a pool
 		#[pallet::constant]
 		type PoolDeposit: Get<Self::Balance>;
-
-		/// The origin permitted to create pools
-		type PoolCreateOrigin: EnsureOrigin<Self::Origin>;
 
 		/// Weight Information
 		type WeightInfo: WeightInfo;
@@ -2000,8 +2000,9 @@ pub mod pallet {
 		}
 	}
 
-	impl PoolMutate for Pallet<T> {
+	impl<T: Config> PoolMutate for Pallet<T> {
 		fn create(
+			admin: T::AccountId,
 			tranche_inputs: Vec<
 				TrancheInput<T::InterestRate, T::MaxTokenNameLength, T::MaxTokenSymbolLength>,
 			>,
@@ -2028,6 +2029,16 @@ pub mod pallet {
 					})
 					.collect(),
 			)?;
+
+			// First we take a deposit.
+			// If we are coming from a signed origin, we take
+			// the deposit from them
+			// If we are coming from some internal origin
+			// (Democracy, Council, etc.) we assume that the
+			// parameters are vetted somehow and rely on the
+			// admin as our depositor.
+			let depositor = ensure_signed(origin).unwrap_or(admin.clone());
+			Self::take_deposit(depositor, pool_id)?;
 
 			let now = Self::now();
 
