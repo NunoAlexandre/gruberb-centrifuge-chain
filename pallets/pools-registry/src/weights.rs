@@ -51,6 +51,7 @@ impl<T: frame_system::Config> WeightInfo for SubstrateWeight<T> {
 			.saturating_add(T::DbWeight::get().reads(4 as Weight))
 			.saturating_add(T::DbWeight::get().writes(1 as Weight))
 	}
+
 	fn set_metadata(n: u32) -> Weight {
 		(35_072_000 as Weight) // Standard Error: 0
 			.saturating_add((13_000 as Weight).saturating_mul(n as Weight))
@@ -74,6 +75,7 @@ impl WeightInfo for () {
 			.saturating_add(RocksDbWeight::get().reads(4 as Weight))
 			.saturating_add(RocksDbWeight::get().writes(1 as Weight))
 	}
+
 	fn set_metadata(n: u32) -> Weight {
 		(35_072_000 as Weight) // Standard Error: 0
 			.saturating_add((13_000 as Weight).saturating_mul(n as Weight))

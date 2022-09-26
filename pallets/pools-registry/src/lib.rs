@@ -68,8 +68,7 @@ pub(crate) trait PoolMutate<
 	Rate,
 	MaxTokenNameLength,
 	MaxTokenSymbolLength,
->
-where
+> where
 	MaxTokenNameLength: Get<u32>,
 	MaxTokenSymbolLength: Get<u32>,
 {
