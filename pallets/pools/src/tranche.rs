@@ -13,7 +13,7 @@
 use cfg_traits::TrancheToken as TrancheTokenT;
 #[cfg(test)]
 use cfg_types::CurrencyId;
-use cfg_types::{CustomMetadata, Seniority, TrancheInput, TrancheType, TrancheUpdate, XcmMetadata};
+use cfg_types::{CustomMetadata, Seniority, TrancheInput, TrancheType, XcmMetadata};
 use frame_support::{sp_runtime::ArithmeticError, StorageHasher};
 use orml_traits::asset_registry::AssetMetadata;
 use polkadot_parachain::primitives::Id as ParachainId;
@@ -68,38 +68,6 @@ pub(super) type TrancheOf<T> = Tranche<
 pub enum TrancheLoc<TrancheId> {
 	Index(TrancheIndex),
 	Id(TrancheId),
-}
-
-impl<Rate> TrancheType<Rate>
-where
-	Rate: PartialOrd + PartialEq,
-{
-	/// Compares tranches with the following schema:
-	///
-	/// * (Residual, Residual) => true
-	/// * (Residual, NonResidual) => true,
-	/// * (NonResidual, Residual) => false,
-	/// * (NonResidual, NonResidual) =>
-	///         interest rate of next tranche must be smaller
-	///         equal to the interest rate of self.
-	///
-	pub fn valid_next_tranche(&self, next: &TrancheType<Rate>) -> bool {
-		match (self, next) {
-			(TrancheType::Residual, TrancheType::Residual) => true,
-			(TrancheType::Residual, TrancheType::NonResidual { .. }) => true,
-			(TrancheType::NonResidual { .. }, TrancheType::Residual) => false,
-			(
-				TrancheType::NonResidual {
-					interest_rate_per_sec: ref interest_prev,
-					..
-				},
-				TrancheType::NonResidual {
-					interest_rate_per_sec: ref interest_next,
-					..
-				},
-			) => interest_prev >= interest_next,
-		}
-	}
 }
 
 #[derive(Clone, Encode, Decode, Eq, PartialEq, RuntimeDebug, TypeInfo)]
