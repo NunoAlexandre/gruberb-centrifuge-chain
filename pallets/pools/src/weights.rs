@@ -30,8 +30,6 @@ use sp_std::marker::PhantomData;
 
 /// Weight functions needed for pallet_pools.
 pub trait WeightInfo {
-	fn create(n: u32) -> Weight;
-	fn update_no_execution(n: u32) -> Weight;
 	fn update_and_execute(n: u32) -> Weight;
 	fn execute_scheduled_update(n: u32) -> Weight;
 	fn set_max_reserve() -> Weight;
@@ -48,20 +46,6 @@ pub trait WeightInfo {
 /// Weights for pallet_pools using the Substrate node and recommended hardware.
 pub struct SubstrateWeight<T>(PhantomData<T>);
 impl<T: frame_system::Config> WeightInfo for SubstrateWeight<T> {
-	fn create(n: u32) -> Weight {
-		(74_485_000 as Weight) // Standard Error: 41_000
-			.saturating_add((299_000 as Weight).saturating_mul(n as Weight))
-			.saturating_add(T::DbWeight::get().reads(6 as Weight))
-			.saturating_add(T::DbWeight::get().writes(6 as Weight))
-	}
-
-	fn update_no_execution(n: u32) -> Weight {
-		(28_660_000 as Weight) // Standard Error: 17_000
-			.saturating_add((285_000 as Weight).saturating_mul(n as Weight))
-			.saturating_add(T::DbWeight::get().reads(4 as Weight))
-			.saturating_add(T::DbWeight::get().writes(1 as Weight))
-	}
-
 	fn update_and_execute(n: u32) -> Weight {
 		(47_893_000 as Weight) // Standard Error: 40_000
 			.saturating_add((716_000 as Weight).saturating_mul(n as Weight))
@@ -146,20 +130,6 @@ impl<T: frame_system::Config> WeightInfo for SubstrateWeight<T> {
 
 // For backwards compatibility and tests
 impl WeightInfo for () {
-	fn create(n: u32) -> Weight {
-		(74_485_000 as Weight) // Standard Error: 41_000
-			.saturating_add((299_000 as Weight).saturating_mul(n as Weight))
-			.saturating_add(RocksDbWeight::get().reads(6 as Weight))
-			.saturating_add(RocksDbWeight::get().writes(6 as Weight))
-	}
-
-	fn update_no_execution(n: u32) -> Weight {
-		(28_660_000 as Weight) // Standard Error: 17_000
-			.saturating_add((285_000 as Weight).saturating_mul(n as Weight))
-			.saturating_add(RocksDbWeight::get().reads(4 as Weight))
-			.saturating_add(RocksDbWeight::get().writes(1 as Weight))
-	}
-
 	fn update_and_execute(n: u32) -> Weight {
 		(47_893_000 as Weight) // Standard Error: 40_000
 			.saturating_add((716_000 as Weight).saturating_mul(n as Weight))

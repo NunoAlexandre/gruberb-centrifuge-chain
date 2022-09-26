@@ -13,7 +13,7 @@
 use cfg_traits::TrancheToken as TrancheTokenT;
 #[cfg(test)]
 use cfg_types::CurrencyId;
-use cfg_types::{CustomMetadata, XcmMetadata};
+use cfg_types::{CustomMetadata, TrancheMetada, TrancheType, TrancheUpdate, XcmMetadata};
 use frame_support::{sp_runtime::ArithmeticError, StorageHasher};
 use orml_traits::asset_registry::AssetMetadata;
 use polkadot_parachain::primitives::Id as ParachainId;
@@ -63,40 +63,11 @@ pub(super) type TrancheOf<T> = Tranche<
 	<T as Config>::CurrencyId,
 >;
 
-/// Type that indicates the seniority of a tranche
-pub type Seniority = u32;
-
-#[derive(Debug, Encode, PartialEq, Eq, Decode, Clone, TypeInfo)]
-pub struct TrancheInput<Rate, MaxTokenNameLength, MaxTokenSymbolLength>
-where
-	MaxTokenNameLength: Get<u32>,
-	MaxTokenSymbolLength: Get<u32>,
-{
-	pub tranche_type: TrancheType<Rate>,
-	pub seniority: Option<Seniority>,
-	pub metadata: TrancheMetadata<MaxTokenNameLength, MaxTokenSymbolLength>,
-}
-
-#[derive(Encode, Decode, Clone, Eq, PartialEq, RuntimeDebug, TypeInfo)]
-pub struct TrancheUpdate<Rate> {
-	pub tranche_type: TrancheType<Rate>,
-	pub seniority: Option<Seniority>,
-}
-
 #[derive(Encode, Decode, Clone, Eq, PartialEq, RuntimeDebug, TypeInfo)]
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 pub enum TrancheLoc<TrancheId> {
 	Index(TrancheIndex),
 	Id(TrancheId),
-}
-
-#[derive(Copy, Clone, Encode, Decode, Eq, PartialEq, RuntimeDebug, TypeInfo)]
-pub enum TrancheType<Rate> {
-	Residual,
-	NonResidual {
-		interest_rate_per_sec: Rate,
-		min_risk_buffer: Perquintill,
-	},
 }
 
 impl<Rate> TrancheType<Rate>
@@ -129,16 +100,6 @@ where
 			) => interest_prev >= interest_next,
 		}
 	}
-}
-
-#[derive(Debug, Encode, PartialEq, Eq, Decode, Clone, TypeInfo)]
-pub struct TrancheMetadata<MaxTokenNameLength, MaxTokenSymbolLength>
-where
-	MaxTokenNameLength: Get<u32>,
-	MaxTokenSymbolLength: Get<u32>,
-{
-	pub token_name: BoundedVec<u8, MaxTokenNameLength>,
-	pub token_symbol: BoundedVec<u8, MaxTokenSymbolLength>,
 }
 
 #[derive(Clone, Encode, Decode, Eq, PartialEq, RuntimeDebug, TypeInfo)]
