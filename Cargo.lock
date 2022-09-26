@@ -6348,6 +6348,7 @@ dependencies = [
  "orml-traits",
  "pallet-balances",
  "pallet-permissions",
+ "pallet-pools-registry",
  "pallet-restricted-tokens",
  "pallet-timestamp",
  "parachain-info",
