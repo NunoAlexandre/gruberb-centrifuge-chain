@@ -346,7 +346,6 @@ impl Config for Test {
 	type PalletIndex = PoolPalletIndex;
 	type ParachainId = ParachainInfo;
 	type Permission = Permissions;
-	type PoolCreateOrigin = EnsureSigned<u64>;
 	type PoolCurrency = PoolCurrency;
 	type PoolDeposit = PoolDeposit;
 	type PoolId = u64;
