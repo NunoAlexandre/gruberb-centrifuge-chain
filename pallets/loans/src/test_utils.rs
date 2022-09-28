@@ -14,7 +14,10 @@
 //! Module provides testing utilities for benchmarking and tests.
 use cfg_primitives::{Moment, CFG as CURRENCY};
 use cfg_traits::{Permissions, PoolNAV};
-use cfg_types::{CurrencyId, PermissionScope, PoolLocator, PoolRole, Role, TrancheInput};
+use cfg_types::{
+	CurrencyId, PermissionScope, PoolLocator, PoolRole, Role, TrancheInput, TrancheMetadata,
+	TrancheType,
+};
 use codec::Encode;
 use frame_support::{
 	assert_ok, parameter_types,
@@ -27,9 +30,7 @@ use frame_support::{
 	Blake2_128, BoundedVec, StorageHasher,
 };
 use frame_system::RawOrigin;
-use pallet_pools::{
-	Pallet as PoolPallet, Pool as PoolStorage, TrancheLoc, TrancheMetadata, TrancheType,
-};
+use pallet_pools::{Pallet as PoolPallet, Pool as PoolStorage, TrancheLoc};
 use sp_runtime::{
 	traits::{AccountIdConversion, Zero},
 	Perquintill,

@@ -447,13 +447,21 @@ fn epoch() {
 		)
 		.unwrap();
 
+		// 				admin,
+		// 				depositor,
+		// 				tranche_inputs,
+		// 				max_reserve,
+		// 				metadata,
+		// 				pool_id,
+		// 				currency,
+
 		// Initialize pool with initial investments
 		const SECS_PER_YEAR: u64 = 365 * 24 * 60 * 60;
 		let senior_interest_rate = Rate::saturating_from_rational(10, 100)
 			/ Rate::saturating_from_integer(SECS_PER_YEAR)
 			+ One::one();
 		assert_ok!(Pools::create(
-			pool_owner_origin.clone(),
+			pool_owner.clone(),
 			pool_owner.clone(),
 			0,
 			vec![
@@ -495,7 +503,6 @@ fn epoch() {
 		));
 
 		assert_ok!(Pools::update(
-			pool_owner_origin.clone(),
 			0,
 			PoolChanges {
 				tranches: Change::NoChange,
