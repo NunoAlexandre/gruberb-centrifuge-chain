@@ -89,6 +89,7 @@ xcm-executor = { git = "https://github.com/paritytech/polkadot", branch = "relea
 cfg-traits = { path = "../../libs/traits" }
 cfg-types = { path = "../../libs/types" }
 pallet-pools = { path = "../../pallets/pools" }
+pallet-pools-registry = { path = "../../pallets/pools-registry" }
 pallet-loans = { path = "../../pallets/loans" }
 pallet-permissions = { path = "../../pallets/permissions" }
 
