@@ -504,13 +504,15 @@ fn epoch() {
 
 		assert_ok!(Pools::update(
 			0,
-			PoolChanges {
-				tranches: Change::NoChange,
-				min_epoch_time: Change::NewValue(30 * 60),
-				max_nav_age: Change::NewValue(0),
-				tranche_metadata: Change::NoChange,
-			}
+			PoolChanges::MinEpochTime(Change::NewValue(30 * 60)),
 		));
+
+		assert_ok!(Pools::update(
+			0,
+			PoolChanges::MaxNavAge(Change::NewValue(0)),
+		));
+
+		assert_ok!(Pools::update(0, PoolChanges::Tranches(Change::NoChange),));
 
 		assert_eq!(
 			<Pools as PoolInspect<
@@ -1337,26 +1339,13 @@ fn pool_updates_should_be_constrained() {
 		let realistic_max_nav_age = 1 * 60; // 1 min
 
 		assert_err!(
-			Pools::update(
-				pool_id,
-				PoolChanges {
-					tranches: Change::NoChange,
-					min_epoch_time: Change::NewValue(0),
-					max_nav_age: Change::NewValue(realistic_max_nav_age),
-					tranche_metadata: Change::NoChange,
-				}
-			),
+			Pools::update(pool_id, PoolChanges::MinEpochTime(Change::NewValue(0))),
 			Error::<Test>::PoolParameterBoundViolated
 		);
 		assert_err!(
 			Pools::update(
 				pool_id,
-				PoolChanges {
-					tranches: Change::NoChange,
-					min_epoch_time: Change::NewValue(realistic_min_epoch_time),
-					max_nav_age: Change::NewValue(7 * 24 * 60 * 60),
-					tranche_metadata: Change::NoChange,
-				}
+				PoolChanges::MaxNavAge(Change::NewValue(7 * 24 * 60 * 60))
 			),
 			Error::<Test>::PoolParameterBoundViolated
 		);
@@ -1370,12 +1359,7 @@ fn pool_updates_should_be_constrained() {
 
 		assert_ok!(Pools::update(
 			pool_id,
-			PoolChanges {
-				tranches: Change::NoChange,
-				min_epoch_time: Change::NewValue(realistic_min_epoch_time),
-				max_nav_age: Change::NewValue(realistic_max_nav_age),
-				tranche_metadata: Change::NoChange,
-			}
+			PoolChanges::MinEpochTime(Change::NewValue(realistic_min_epoch_time))
 		));
 
 		// Since there's a redemption order, the above update should not have been executed yet
